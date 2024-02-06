@@ -1,0 +1,26 @@
+FROM golang:1.21.6-alpine3.19 AS builder
+
+RUN apk update && apk add --no-cache gcc musl-dev make
+
+WORKDIR /app
+
+COPY . .
+
+RUN make dependency
+# CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+RUN make service
+
+FROM alpine:3.19
+
+WORKDIR /app
+COPY --from=builder /app/bin/analytics-server /app
+
+EXPOSE 3000
+
+# Add docker-compose-wait tool -------------------
+ENV WAIT_VERSION 2.9.0
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
+RUN chmod +x /wait
+
+# ENTRYPOINT ["./fleet-state-service"]
+CMD /wait && ./analytics-server

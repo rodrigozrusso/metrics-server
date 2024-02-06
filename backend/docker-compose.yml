@@ -1,0 +1,51 @@
+version: '3'
+services:
+  # postgres:
+  #   image: postgres:15.2-alpine
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   restart: always
+  #   healthcheck:
+  #     test: "pg_isready --username=analytics && psql --username=analytics --list"
+  #     timeout: 10s
+  #     retries: 20
+  #   networks:
+  #     - app-tier
+
+  timescaledb:
+    # image: timescale/timescaledb:latest-pg16
+    image: timescale/timescaledb:latest-pg15
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    environment:
+      PGDATA: /var/lib/postgresql/data/timescaledb
+    # volumes:
+    #   - data/timescaledb:/var/lib/postgresql/data
+    networks:
+      - app-tier
+
+  analytics-server:
+    build:
+      context: ./
+      dockerfile: Dockerfile.server
+    container_name: analytics-server
+    depends_on:
+      # - postgres
+      - timescaledb
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - app-tier
+
+networks:
+  app-tier:
+    driver: bridge
