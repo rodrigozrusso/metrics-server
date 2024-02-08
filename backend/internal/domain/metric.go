@@ -19,7 +19,18 @@ const (
 )
 
 type MetricAVGResult struct {
-	TimeFrame time.Time
-	Name      string
-	Avg       float64
+	TimeFrame time.Time `json:"timeFrame"`
+	Avg       float64   `json:"avg"`
+}
+
+type AVGMetricResponse struct {
+	MetricName  string            `json:"metricName"`
+	Granularity string            `json:"granularity"`
+	StartTime   time.Time         `json:"startTime"`
+	EndTime     time.Time         `json:"endTime"`
+	Data        []MetricAVGResult `json:"data"`
+}
+
+type MetricsResponse struct {
+	Name string `json:"name"`
 }

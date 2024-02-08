@@ -71,10 +71,10 @@ func getDataByMetricName(service service.Service) fiber.Handler {
 			return c.Status(http.StatusBadRequest).SendString("Invalid endDate format")
 		}
 
-		metrics, err := service.GetDataByMetricName(metricName, domain.Granularity(granularity), startDate, endDate)
+		metricsResponse, err := service.GetDataByMetricName(metricName, domain.Granularity(granularity), startDate, endDate)
 		if err != nil {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
-		return c.JSON(metrics)
+		return c.JSON(metricsResponse)
 	}
 }

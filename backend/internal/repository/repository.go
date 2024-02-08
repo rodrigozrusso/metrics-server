@@ -10,7 +10,7 @@ import (
 type Repository interface {
 	CreateHyperTable() error
 	AddMetric(state domain.Metric) error
-	ListMetrics() ([]domain.Metric, error)
+	ListMetrics() ([]string, error)
 	GetDataByMetricName(metricName string, granularity domain.Granularity, startDate time.Time, endDate time.Time) ([]domain.MetricAVGResult, error)
 }
 
@@ -32,9 +32,10 @@ func (r repository) AddMetric(state domain.Metric) error {
 	return r.DB.Create(&state).Error
 }
 
-func (r repository) ListMetrics() ([]domain.Metric, error) {
-	var metrics []domain.Metric
-	err := r.DB.Find(&metrics).Error
+func (r repository) ListMetrics() ([]string, error) {
+	// var metrics []domain.MetricsResponse
+	var metrics []string
+	err := r.DB.Raw("SELECT distinct name FROM metrics ORDER BY name ASC").Scan(&metrics).Error
 	return metrics, err
 }
 

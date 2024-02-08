@@ -10,6 +10,7 @@ import (
 	"acme.inc/analytics/internal/repository"
 	"acme.inc/analytics/internal/service"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"go.uber.org/zap"
 )
@@ -21,10 +22,11 @@ func main() {
 		defer logger.Sync()
 	}
 
-	log.Printf("Starting analytics server")
+	zap.L().Info("Starting analytics server")
 	// database
 	config := common.NewConfiguration()
-	// db, err := common.NewTimescaleDB(config.DataBaseConfig)
+	// db, err :=
+	common.NewTimescaleDB(config.DataBaseConfig)
 	db, err := common.NewGormDB(config.DataBaseConfig)
 	if err != nil {
 		panic("failed to connect database")
@@ -39,6 +41,7 @@ func main() {
 		DisableStartupMessage: true,
 	})
 	app.Use(logger.New())
+	app.Use(cors.New())
 
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
@@ -49,12 +52,6 @@ func main() {
 	repository.CreateHyperTable()
 	metricService := service.NewService(repository)
 	handler.NewHandler(app, metricService)
-	// vinPositionEventHandler := service.NewEventHandler(broker, stateRepo)
-	// stateService := service.NewService(stateRepo, vinPositionEventHandler)
-	// handler.NewCommandHandler(app, stateService)
-	// handler.NewQuerydHandler(app, stateService)
-
-	// go vinPositionEventHandler.Consume()
 
 	serverPort := fmt.Sprintf(":%s", config.ServerConfig.Port)
 	log.Fatal(app.Listen(serverPort))

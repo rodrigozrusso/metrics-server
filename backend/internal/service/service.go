@@ -9,9 +9,9 @@ import (
 )
 
 type Service interface {
-	GetDataByMetricName(metricName string, granularity domain.Granularity, startDate time.Time, endDate time.Time) ([]domain.MetricAVGResult, error)
+	GetDataByMetricName(metricName string, granularity domain.Granularity, startDate time.Time, endDate time.Time) (domain.AVGMetricResponse, error)
 	AddMetric(cmd domain.Metric) error
-	ListMetrics() ([]domain.Metric, error)
+	ListMetrics() ([]string, error)
 }
 
 type service struct {
@@ -39,10 +39,18 @@ func (s *service) AddMetric(metric domain.Metric) error {
 	return err
 }
 
-func (s *service) ListMetrics() ([]domain.Metric, error) {
+func (s *service) ListMetrics() ([]string, error) {
 	return s.repository.ListMetrics()
 }
 
-func (s *service) GetDataByMetricName(metricName string, granularity domain.Granularity, startDate time.Time, endDate time.Time) ([]domain.MetricAVGResult, error) {
-	return s.repository.GetDataByMetricName(metricName, granularity, startDate, endDate)
+func (s *service) GetDataByMetricName(metricName string, granularity domain.Granularity, startDate time.Time, endDate time.Time) (domain.AVGMetricResponse, error) {
+	data, err := s.repository.GetDataByMetricName(metricName, granularity, startDate, endDate)
+	var avgMetricResponse domain.AVGMetricResponse
+	avgMetricResponse.MetricName = metricName
+	avgMetricResponse.Granularity = string(granularity)
+	avgMetricResponse.StartTime = startDate
+	avgMetricResponse.EndTime = endDate
+	avgMetricResponse.Data = data
+
+	return avgMetricResponse, err
 }
