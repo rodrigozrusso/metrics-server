@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 SIMULATOR_BINARY=bin/simulator
-ANALYTICS_SERVER_BINARY=bin/analytics-server
+METRICS_SERVER_API_BINARY=bin/metrics-server
 VERSION=$(shell git tag | tail -1)
 BUILD=$(shell git rev-parse HEAD)
 
@@ -9,7 +9,7 @@ all: server simulator
 
 .PHONY: server
 server:
-	go build -o $(ANALYTICS_SERVER_BINARY) ./cmd/analytics-server/main.go
+	go build -o $(METRICS_SERVER_API_BINARY) ./cmd/metrics-server/main.go
 
 .PHONY: simulator
 simulator:
@@ -25,7 +25,7 @@ dependency:
 
 .PHONY: clean
 clean:
-	-rm -f $(SIMULATOR_BINARY) $(ANALYTICS_SERVER_BINARY)
+	-rm -f $(SIMULATOR_BINARY) $(METRICS_SERVER_API_BINARY)
 
 # .PHONY: build/docker
 build/docker:
@@ -33,4 +33,4 @@ build/docker:
 
 .PHONY: build/docker/service
 build/docker/service:
-	docker build -t analytics-server -f Dockerfile.server .
+	docker build -t metrics-server -f Dockerfile.server .

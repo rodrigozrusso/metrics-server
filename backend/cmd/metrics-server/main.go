@@ -44,8 +44,6 @@ func main() {
 	app.Use(recover.New())
 	app.Use(cors.New())
 
-	// app.Use((handler.ErrorHandler))
-
 	// healthcheck
 	healthcheck.NewHandler(app, sqlDB)
 
