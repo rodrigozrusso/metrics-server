@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"acme.inc/analytics/internal/domain"
+	"acme.inc/analytics/internal/metrics"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
@@ -57,8 +57,8 @@ func main() {
 	}
 }
 
-func generateData(metricName string) domain.Metric {
-	metric := domain.Metric{
+func generateData(metricName string) metrics.Metric {
+	metric := metrics.Metric{
 		Timestamp: time.Date(gofakeit.Number(2022, 2023), time.Month(gofakeit.Number(1, 12)), gofakeit.Number(1, 28), gofakeit.Number(0, 23), gofakeit.Number(0, 59), gofakeit.Number(0, 59), 0, time.UTC),
 		Name:      metricName,
 		Value:     gofakeit.Float64Range(20, 40),

@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"log"
 
-	handler "acme.inc/analytics/internal/api/v1"
 	"acme.inc/analytics/internal/common"
-	"acme.inc/analytics/internal/domain"
-	"acme.inc/analytics/internal/repository"
-	"acme.inc/analytics/internal/service"
+	internalError "acme.inc/analytics/internal/error"
+	"acme.inc/analytics/internal/healthcheck"
+	"acme.inc/analytics/internal/metrics"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"go.uber.org/zap"
 )
 
@@ -32,7 +32,7 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&domain.Metric{})
+	db.AutoMigrate(&metrics.Metric{})
 	sqlDB, _ := db.DB()
 	defer sqlDB.Close()
 
@@ -41,17 +41,22 @@ func main() {
 		DisableStartupMessage: true,
 	})
 	app.Use(logger.New())
+	app.Use(recover.New())
 	app.Use(cors.New())
 
-	app.Get("/ping", func(c *fiber.Ctx) error {
-		return c.SendString("pong")
-	})
+	// app.Use((handler.ErrorHandler))
 
-	// services
-	repository := repository.NewRepository(db)
+	// healthcheck
+	healthcheck.NewHandler(app, sqlDB)
+
+	v1 := app.Group("/v1")
+	// metrics
+	repository := metrics.NewRepository(db)
 	repository.CreateHyperTable()
-	metricService := service.NewService(repository)
-	handler.NewHandler(app, metricService)
+	metricService := metrics.NewService(repository)
+	metrics.NewHandler(v1, metricService)
+
+	app.Use((internalError.NotFound))
 
 	serverPort := fmt.Sprintf(":%s", config.ServerConfig.Port)
 	log.Fatal(app.Listen(serverPort))
