@@ -28,14 +28,20 @@ func health(sqlDB *sql.DB) fiber.Handler {
 			Name: "database",
 		}
 
-		// check db health
-		err := sqlDB.Ping()
-		if err != nil {
+		if sqlDB == nil {
 			dbHealthCheckResp.Status = Fail
-			dbHealthCheckResp.Message = err.Error()
-			response.Status = Warm // warm that db is not healthy
+			dbHealthCheckResp.Message = "Database is not connected"
+			response.Status = Fail
 		} else {
-			dbHealthCheckResp.Status = Ok
+			// check db health
+			err := sqlDB.Ping()
+			if err != nil {
+				dbHealthCheckResp.Status = Fail
+				dbHealthCheckResp.Message = err.Error()
+				response.Status = Warm // warm that db is not healthy
+			} else {
+				dbHealthCheckResp.Status = Ok
+			}
 		}
 
 		response.Resources = append(response.Resources, dbHealthCheckResp)
