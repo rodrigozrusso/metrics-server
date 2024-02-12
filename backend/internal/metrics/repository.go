@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate ${MOCKGEN} -destination ./mock/mock_idp.go -source ./idp.go -package mock
 type Repository interface {
 	CreateHyperTable() error
 	AddMetric(state Metric) error

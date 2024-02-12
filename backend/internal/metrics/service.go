@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
+//go:generate ${MOCKGEN} -destination ./mock/mock_service.go -source ./service.go -package mock
 type Service interface {
 	GetDataByMetricName(metricName string, granularity Granularity, startDate time.Time, endDate time.Time) (AVGMetricResponse, error)
 	AddMetric(cmd Metric) error
@@ -33,8 +34,9 @@ func (s *service) AddMetric(metric Metric) error {
 			zap.String("metric", metric.Name),
 			zap.Time("timestamp", metric.Timestamp),
 			zap.Error(err))
+		return err
 	}
-	return err
+	return nil
 }
 
 func (s *service) ListMetrics() ([]string, error) {

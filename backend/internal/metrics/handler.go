@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"acme.inc/analytics/internal/internalError"
 	fiber "github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -27,13 +28,14 @@ func addMetric(service Service) fiber.Handler {
 
 		var metric Metric
 		if err := c.BodyParser(&metric); err != nil {
-			return c.Status(503).Send([]byte(err.Error()))
+			return c.Status(http.StatusBadRequest).JSON(&internalError.FailedResponse{Message: "Invalid Payload. Please verify the request payload and try again."})
 		}
 		zap.L().Info("Metric", zap.Any("metric", metric))
 
-		if err := service.AddMetric(metric); err != nil {
+		err := service.AddMetric(metric)
+		if err != nil {
 			zap.L().Error("Metric", zap.Any("metric", metric), zap.Error(err))
-			c.Status(http.StatusInternalServerError)
+			return c.Status(http.StatusInternalServerError).JSON(&internalError.FailedResponse{Message: "Well, This is unexpected. An Error has occurred, and we are working to fix the problem!"})
 		}
 
 		return c.SendStatus(fiber.StatusCreated)
@@ -44,7 +46,7 @@ func listMetrics(service Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		metrics, err := service.ListMetrics()
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+			return c.Status(http.StatusInternalServerError).JSON(&internalError.FailedResponse{Message: "Well, This is unexpected. An Error has occurred, and we are working to fix the problem!"})
 		}
 		return c.JSON(metrics)
 	}
@@ -58,20 +60,28 @@ func getDataByMetricName(service Service) fiber.Handler {
 		startDateStr := c.Params("startDate")
 		endDateStr := c.Params("endDate")
 
+		zap.L().Debug("getDataByMetricName", zap.String("metricName", metricName), zap.String("granularity", granularity), zap.String("startDate", startDateStr), zap.String("endDate", endDateStr))
+
 		const layout = "2006-01-02"
 		startDate, err := time.Parse(layout, startDateStr)
 		if err != nil {
-			return c.Status(http.StatusBadRequest).SendString("Invalid startDate format")
+			return c.Status(http.StatusBadRequest).JSON(&internalError.FailedResponse{Message: "Invalid startDate format"})
 		}
 
 		endDate, err := time.Parse(layout, endDateStr)
 		if err != nil {
-			return c.Status(http.StatusBadRequest).SendString("Invalid endDate format")
+			return c.Status(http.StatusBadRequest).JSON(&internalError.FailedResponse{Message: "Invalid endDate format"})
 		}
 
 		metricsResponse, err := service.GetDataByMetricName(metricName, Granularity(granularity), startDate, endDate)
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+			zap.L().Error("Error to retrieve data",
+				zap.Error(err),
+				zap.String("metricName", metricName),
+				zap.String("granularity", granularity),
+				zap.String("startDate", startDateStr),
+				zap.String("endDate", startDateStr))
+			return c.Status(http.StatusInternalServerError).JSON(&internalError.FailedResponse{Message: "Well, This is unexpected. An Error has occurred, and we are working to fix the problem!"})
 		}
 		return c.JSON(metricsResponse)
 	}

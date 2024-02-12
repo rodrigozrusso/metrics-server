@@ -1,4 +1,4 @@
-package error
+package internalError
 
 import fiber "github.com/gofiber/fiber/v2"
 
