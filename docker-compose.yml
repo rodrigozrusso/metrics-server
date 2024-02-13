@@ -1,0 +1,33 @@
+version: '3'
+services:
+  metrics-server-api:
+    extends:
+      file: backend/docker-compose.yml
+      service: metrics-server-api
+    networks:
+      - app-tier
+
+  metrics-server-ui:
+    extends:
+      file: metrics-server-ui/docker-compose.yml
+      service: metrics-server-ui
+    depends_on:
+      - metrics-server-api
+    networks:
+      - app-tier
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    environment:
+      PGDATA: /var/lib/postgresql/data/timescaledb
+    networks:
+      - app-tier
+
+networks:
+  app-tier:
+    driver: bridge
