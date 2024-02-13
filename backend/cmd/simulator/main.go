@@ -67,7 +67,7 @@ func generateData(metricName string) metrics.Metric {
 }
 
 func send(metricName string) {
-	baseURL := os.Getenv("ANALYTICS_SERVER_URL")
+	baseURL := os.Getenv("METRICS_SERVER_URL")
 	url := fmt.Sprintf("%s/v1/metrics", baseURL)
 
 	for true {
