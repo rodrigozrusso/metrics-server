@@ -1,0 +1,20 @@
+FROM golang:1.21.6-alpine3.19 AS builder
+
+RUN apk update && apk add --no-cache gcc musl-dev make
+
+WORKDIR /app
+
+COPY . .
+
+RUN make dependency
+RUN make simulator
+
+FROM alpine:3.19
+
+WORKDIR /app
+COPY --from=builder /app/bin/simulator /app
+
+## Add the wait script to the image
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
+
+CMD /wait && ./simulator

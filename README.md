@@ -1,8 +1,11 @@
 # Metrics Server
 
 This project is a metrics server composed by the `metrics-server-api` (backend) and the `metrics-server-ui` (frontend).
+
 The `metrics-server-api` exposes the API to ingest metrics and to consume aggregated metrics per granularity.
+
 The `metrics-server-ui` shows a chart of the aggregated data.
+
 Bonus: there is a `simulator` (CLI tool) to send multiple metrics concurrently (20 metrics every 300 ms).
 
 ## Specification #3 (better for senior)
@@ -16,18 +19,18 @@ Bonus: there is a `simulator` (CLI tool) to send multiple metrics concurrently (
 
 ## Project Structure
 
+```
 .
-├── README.md
-├── backend
-├── docker-compose.yml
 ├── docs
-└── metrics-server-ui
+├── metrics-server-api <-- backend / simulator
+└── metrics-server-ui  <-- frontend
+```
 
 ## Documentation
 
 You can find the documentation of each project (backend and frontend) on its own README.md files:
 - [`metrics-server-ui` (frontend)](metrics-server-ui/README.md)
-- [`metrics-server-api` (backend)](backend/README.md)
+- [`metrics-server-api` (backend)](metrics-server-api/README.md)
 
 ## Getting Started
 
@@ -58,6 +61,13 @@ You can run the frontend, backend and the database using Docker Compose
   curl -i -X POST -H "Content-Type: application/json" --data "{\"timestamp\":\"2024-02-02T11:43:02.099Z\", \"name\":\"temperature\",\"value\":30}" http://localhost:8080/v1/metrics
   ```
 
+  Alternatively, you can run the simulator
+
+  ```bash
+  docker-compose run simulator
+  ```
+  It will spam the stdout with the log every second.
+
   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Architecture decisions
@@ -87,23 +97,16 @@ Backend:
 - [ ] API Swagger documentation
 - [ ] CI/CD
 - [ ] Deploy to a cloud provider
-- [ ] Renomear pacote para metrics-server go.mod
-- [ ] Renomear backend para metrics-server-api
 
 Frontend:
 - [x] Sparkline chart component
 - [x] Filter by:
   - granularity: use for `minute`, `hour` and `day`
   - time frame: use for two different dates including times (hour/min/sec). E.g: "02-02-2024 16:50:00" and "02-02-2024 18:50:00"
-- [ ] Component Tests
+- [ ] Write tests for the components and page.
 - [ ] CI/CD
 - [ ] Deploy to a cloud provider
 
 
 Producer Simulator (Bonus):
 - [x] post a metrics every second or less
-
-
-```
-curl -i -X POST -H "Content-Type: application/json" --data "{\"timestamp\":\"2024-02-02T11:43:02.099Z\", \"name\":\"temperature\",\"value\":30}" localhost:8080/v1/metrics
-```

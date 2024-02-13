@@ -31,6 +31,10 @@ clean:
 build/docker:
 	docker-compose build
 
-.PHONY: build/docker/service
-build/docker/service:
+.PHONY: build/docker/server
+build/docker/server:
 	docker build -t metrics-server-api -f Dockerfile.server .
+
+.PHONY: build/docker/simulator
+build/docker/simulator:
+	docker build -t metrics-server-simulator -f Dockerfile.simulator .

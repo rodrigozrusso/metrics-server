@@ -1,11 +1,9 @@
 package common
 
 import (
-	"context"
 	"fmt"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
@@ -39,22 +37,4 @@ func NewGormDB(dataBaseConfig *DataBaseConfig) (*gorm.DB, error) {
 	}
 
 	return db, nil
-}
-
-func NewTimescaleDB(dataBaseConfig *DataBaseConfig) (*pgxpool.Pool, error) {
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable connect_timeout=%d", dataBaseConfig.Host, dataBaseConfig.Port, dataBaseConfig.User, dataBaseConfig.Password, dataBaseConfig.Name, dataBaseConfig.Timeout)
-
-	ctx := context.Background()
-	dbpool, err := pgxpool.New(ctx, dsn)
-	if err != nil {
-		zap.L().Error("Error to connect to the database", zap.String("dsn", dsn))
-		return nil, err
-	}
-	defer dbpool.Close()
-
-	if err = dbpool.Ping(ctx); err != nil {
-		return nil, err
-	}
-
-	return dbpool, nil
 }

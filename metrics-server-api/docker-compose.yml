@@ -33,6 +33,22 @@ services:
     networks:
       - app-tier
 
+  simulator:
+    build:
+      context: ./
+      dockerfile: Dockerfile.simulator
+    container_name: metrics-server-simulator
+    depends_on:
+      - metrics-server-api
+    env_file:
+      - .env
+    environment:
+      - METRICS_SERVER_URL=http://metrics-server-api:8080
+      - WAIT_HOSTS=metrics-server-api:8080
+    profiles: [ "simulator" ]
+    networks:
+      - app-tier
+
 networks:
   app-tier:
     driver: bridge

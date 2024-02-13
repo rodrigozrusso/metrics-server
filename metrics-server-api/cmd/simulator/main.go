@@ -30,7 +30,10 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		zap.L().Fatal("Error loading .env file")
+		if os.Getenv("METRICS_SERVER_URL") == "" {
+			zap.L().Fatal("Error loading .env file")
+			os.Exit(1)
+		}
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -45,10 +48,6 @@ func main() {
 	for i := 0; i < len(metrics); i++ {
 		go send(metrics[i])
 	}
-	// <-ctx.Done()
-	// zap.L().Info("got interruption signal")
-	// shutdown = true
-	// zap.L().Info("final")
 
 	select {
 	case <-ctx.Done():
@@ -59,7 +58,7 @@ func main() {
 
 func generateData(metricName string) metrics.Metric {
 	metric := metrics.Metric{
-		Timestamp: time.Date(gofakeit.Number(2022, 2023), time.Month(gofakeit.Number(1, 12)), gofakeit.Number(1, 28), gofakeit.Number(0, 23), gofakeit.Number(0, 59), gofakeit.Number(0, 59), 0, time.UTC),
+		Timestamp: time.Date(gofakeit.Number(2023, 2024), time.Month(gofakeit.Number(1, 3)), gofakeit.Number(1, 28), gofakeit.Number(0, 23), gofakeit.Number(0, 59), gofakeit.Number(0, 59), 0, time.UTC),
 		Name:      metricName,
 		Value:     gofakeit.Float64Range(20, 40),
 	}
@@ -95,7 +94,6 @@ func makePost(url string, json_data []byte) bool {
 		zap.L().Fatal("Position could not be processed on server")
 		return false
 	}
-	// time.Sleep(1 * time.Second)
 	time.Sleep(300 * time.Millisecond)
 	return true
 }

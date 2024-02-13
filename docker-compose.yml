@@ -2,8 +2,11 @@ version: '3'
 services:
   metrics-server-api:
     extends:
-      file: backend/docker-compose.yml
+      file: metrics-server-api/docker-compose.yml
       service: metrics-server-api
+    environment:
+      - DB_HOST=timescaledb
+      - WAIT_HOSTS=timescaledb:5432
     networks:
       - app-tier
 
@@ -13,6 +16,8 @@ services:
       service: metrics-server-ui
     depends_on:
       - metrics-server-api
+    environment:
+      - METRICS_SERVER_URL=http://metrics-server-api:8080
     networks:
       - app-tier
 
@@ -25,6 +30,15 @@ services:
       - 5432:5432
     environment:
       PGDATA: /var/lib/postgresql/data/timescaledb
+    networks:
+      - app-tier
+
+  simulator:
+    extends:
+      file: metrics-server-api/docker-compose.yml
+      service: simulator
+    depends_on:
+      - metrics-server-api
     networks:
       - app-tier
 
