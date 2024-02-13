@@ -51,11 +51,12 @@ You can run the frontend, backend and the database using Docker Compose
 
   ```
   NAME                             IMAGE                                 COMMAND                  SERVICE              CREATED         STATUS         PORTS
-  metrics-server-api               simple_analytics-metrics-server-api   "/bin/sh -c '/wait &…"   metrics-server-api   2 minutes ago   Up 4 seconds   3000/tcp, 0.0.0.0:8080->8080/tcp
-  metrics-server-ui                simple_analytics-metrics-server-ui    "docker-entrypoint.s…"   metrics-server-ui    2 minutes ago   Up 2 minutes   0.0.0.0:3000->3000/tcp
-  simple_analytics-timescaledb-1   timescale/timescaledb:latest-pg15     "docker-entrypoint.s…"   timescaledb          2 minutes ago   Up 2 minutes   0.0.0.0:5432->5432/tcp
+  metrics-server-api               metrics_server-metrics-server-api   "/bin/sh -c '/wait &…"   metrics-server-api   2 minutes ago   Up 4 seconds   3000/tcp, 0.0.0.0:8080->8080/tcp
+  metrics-server-ui                metrics_server-metrics-server-ui    "docker-entrypoint.s…"   metrics-server-ui    2 minutes ago   Up 2 minutes   0.0.0.0:3000->3000/tcp
+  metrics_server-timescaledb-1   timescale/timescaledb:latest-pg15     "docker-entrypoint.s…"   timescaledb          2 minutes ago   Up 2 minutes   0.0.0.0:5432->5432/tcp
   ```
 
+#### Sending metrics
   You can post a metric:
   ```
   curl -i -X POST -H "Content-Type: application/json" --data "{\"timestamp\":\"2024-02-02T11:43:02.099Z\", \"name\":\"temperature\",\"value\":30}" http://localhost:8080/v1/metrics
@@ -88,7 +89,7 @@ You can run the frontend, backend and the database using Docker Compose
 ## TODO
 Here you can find the tasks that I planned for this project.
 
-Unfortunately, I couldn't do all of them, but you can verify the ones that is missing.
+Unfortunately, I couldn't do all of them, but you can verify the missing ones.
 
 Backend:
 - [X] API to receive the metric (POST)

@@ -57,7 +57,7 @@ _Bonus_: there is a `simulator` (CLI tool) to send multiple metrics concurrently
 
 ### Actions
 
-For more details on the API spec, verify the live documentation with swagger.
+You can perform the following actions via API:
 
 #### Posting a metric
 
