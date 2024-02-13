@@ -8,6 +8,8 @@ The `metrics-server-ui` shows a chart of the aggregated data.
 
 Bonus: there is a `simulator` (CLI tool) to send multiple metrics concurrently (20 metrics every 300 ms).
 
+✨ You can watch my [3 minutes video demo](https://www.loom.com/share/ca3510d169bb4eb992bdf980c3c2a309) of the project!
+
 ## Specification #3 (better for senior)
 
 > We need a Frontend + Backend application that allows you to post and visualize metrics.
