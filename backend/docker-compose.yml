@@ -9,6 +9,10 @@ services:
       - 5432:5432
     environment:
       PGDATA: /var/lib/postgresql/data/timescaledb
+    healthcheck:
+      test: "pg_isready --username=metrics-server && psql --username=metrics-server --list"
+      timeout: 10s
+      retries: 20
     networks:
       - app-tier
 
@@ -25,6 +29,7 @@ services:
       - .env
     environment:
       - DB_HOST=timescaledb
+      - WAIT_HOSTS=timescaledb:5432
     networks:
       - app-tier
 

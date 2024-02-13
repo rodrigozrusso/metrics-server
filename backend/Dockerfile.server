@@ -14,11 +14,9 @@ FROM alpine:3.19
 WORKDIR /app
 COPY --from=builder /app/bin/metrics-server-api /app
 
-EXPOSE 8080
+## Add the wait script to the image
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 
-# Add docker-compose-wait tool
-ENV WAIT_VERSION 2.9.0
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
-RUN chmod +x /wait
+EXPOSE 8080
 
 CMD /wait && ./metrics-server-api
