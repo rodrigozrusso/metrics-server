@@ -38,7 +38,7 @@ func addMetric(service Service) fiber.Handler {
 			return c.Status(http.StatusInternalServerError).JSON(&internalError.FailedResponse{Message: "Well, This is unexpected. An Error has occurred, and we are working to fix the problem!"})
 		}
 
-		return c.SendStatus(fiber.StatusCreated)
+		return c.Status(http.StatusCreated).JSON(fiber.Map{"status": "success"})
 	}
 }
 
