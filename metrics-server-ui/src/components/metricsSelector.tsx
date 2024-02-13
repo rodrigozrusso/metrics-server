@@ -15,7 +15,7 @@ export default function MetricsSelector() {
   };
 
   const getMetricList = async () => {
-    const metricServerURL = process.env.METRIC_SERVER_URL || 'http://localhost:8080';
+    const metricServerURL = process.env.METRICS_SERVER_URL || 'http://localhost:8080';
     const metricsURL = `${metricServerURL}/v1/metrics/`
     const response = await fetch(metricsURL, {
       method: "GET",

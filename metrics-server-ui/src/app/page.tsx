@@ -69,7 +69,8 @@ export default function Home() {
   }
 
   const getData = async (metricName: string, granularity: string, startDate: string, endDate: string) => {
-    const metricsURL = `http://localhost:8080/v1/metrics/${metricName}/${granularity}/${startDate}/${endDate}`
+    const metricServerURL = process.env.METRICS_SERVER_URL || 'http://localhost:8080';
+    const metricsURL = `${metricServerURL}/v1/metrics/${metricName}/${granularity}/${startDate}/${endDate}`
     const response = await fetch(metricsURL, {
       method: "GET",
     });
@@ -126,7 +127,7 @@ export default function Home() {
         <div>Loading chart...</div>
       ) : isResultSuccess ? (
         <div>
-          <LineChart data={data as unknown as ChartTabularData} options={options as LineChartOptions} />
+          <LineChart data={data as unknown as ChartTabularData} options={options as unknown as LineChartOptions} />
         </div>
       ) : (
         <div>
